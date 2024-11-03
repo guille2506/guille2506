@@ -11,13 +11,15 @@
 
 <br><br>
 
-- :school: I am a Software Development student at [Instituto Cervantes](https://example.com) in San Juan, Argentina.
-- :trophy: Experience in developing `Banking Solutions` and `Educational Platforms`.
-- :technologist: Passionate about using software to solve complex problems.
-- :student: Currently learning `Java` and `React.js`.
-- :nerd_face: Always eager to `learn new things`.
-- :thinking: Open to new `job opportunities`. This is [my resume](https://example.com).
-- :boom: You can visit [my website](https://example.com).
+<p style="font-size:18px;">- :school: I am a Software Development student at <a href="https://example.com">Instituto Cervantes</a> in San Juan, Argentina.</p>
+<p style="font-size:18px;">- :trophy: Experience in developing <code>Banking Solutions</code> and <code>Educational Platforms</code>.</p>
+<p style="font-size:18px;">- :technologist: Passionate about using software to solve complex problems.</p>
+<p style="font-size:18px;">- :computer: Skilled in Frontend (HTML, CSS, JavaScript) and Backend (API, database) development.</p>
+<p style="font-size:18px;">- :student: Currently learning <code>Java</code> and <code>React.js</code>.</p>
+<p style="font-size:18px;">- :nerd_face: Always eager to <code>learn new things</code>.</p>
+<p style="font-size:18px;">- :thinking: Open to new <code>job opportunities</code>. This is <a href="https://example.com">my resume</a>.</p>
+<p style="font-size:18px;">- :boom: You can visit <a href="https://example.com">my website</a>.</p>
+<br>
 
 <br>
 
