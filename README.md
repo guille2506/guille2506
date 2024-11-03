@@ -2,7 +2,6 @@
     <img src="https://emoji.gg/assets/emoji/7333-parrotdance.gif" width="35">
 </h1>
 
-<br><br>
 
 
 ## <picture><img src = "https://media.tenor.com/HsT2hrwNDkcAAAAj/maxwell-cat.gif" width = 50px></picture> About me
