@@ -9,7 +9,6 @@
 <picture> <img alt="dsmark" align="right" height="50%" width="50%" src="https://c.tenor.com/NzrqQHFBVz8AAAAj/kitty-transparent.gif">></picture>
 
 
-<br><br>
 
 <p style="font-size:18px;">- :school: I am a Software Development student at <a href="https://example.com">Instituto Cervantes</a> in San Juan, Argentina.</p>
 <p style="font-size:18px;">- :trophy: Experience in developing <code>Banking Solutions</code> and <code>Educational Platforms</code>.</p>
