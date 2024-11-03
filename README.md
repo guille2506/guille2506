@@ -68,7 +68,7 @@
 </br>
 </div>
 <br />
-<p align="center"><img width="50%" src="https://github-readme-streak-stats.herokuapp.com/?user=guille2506&theme=gotham&show_icons=true" alt="guille2506"/>
+<p align="left"><img width="50%" src="https://github-readme-streak-stats.herokuapp.com/?user=guille2506&theme=gotham&show_icons=true" alt="guille2506"/>
 
 <img width="50%" src="https://github-readme-stats-ten-gilt.vercel.app/api?username=guille2506&show_icons=true&theme=gotham"/>
 </p>
