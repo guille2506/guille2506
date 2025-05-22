@@ -16,7 +16,7 @@
 <p style="font-size:18px;">- :student: Currently learning <code>Java</code> and <code>React.js</code>.</p>
 <p style="font-size:18px;">- :nerd_face: Always eager to <code>learn new things</code>.</p>
 <p style="font-size:18px;">- :thinking: Open to new <code>job opportunities</code>. This is <a href="https://example.com">my resume</a>.</p>
-<p style="font-size:18px;">- :boom: You can visit <a href="https://example.com">my website</a>.</p>
+<p style="font-size:18px;">- :boom: You can visit <a href="https://guillermoillanes.com/">my website</a>.</p>
 <br>
 
 <br>
