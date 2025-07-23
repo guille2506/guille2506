@@ -58,7 +58,7 @@
 
 <p align="left">
   <a href="https://skillicons.dev">
-    <img src="https://www.linkedin.com/in/guillermo-illanes-172aaa229/i=instagram,linkedin,stackoverflow" />
+    <img src="https://skillicons.dev/icons?i=instagram,linkedin,stackoverflow" />
   </a>
 </p>
 
