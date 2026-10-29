@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="300" viewBox="0 0 960 300" font-family="'IBM Plex Mono','JetBrains Mono','Courier New',monospace">
+  <rect width="960" height="300" fill="#0d1117"/>
+  <rect width="960" height="300" fill="url(#grille)" opacity="1"/>
+  <defs>
+    <pattern id="grille" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0V48H0" fill="none" stroke="#1d2946" stroke-width="1" opacity="0.45"/>
+    </pattern>
+    <pattern id="crossesx" width="192" height="192" patternUnits="userSpaceOnUse" x="40" y="16">
+      <path d="M90 96h12M96 90v12" fill="none" stroke="#ff2633" stroke-opacity="0.18" stroke-width="1.6"/>
+    </pattern>
+  </defs>
+  <rect width="960" height="300" fill="url(#crossesx)"/>
+  <text x="30" y="52" font-size="20" letter-spacing="6" fill="#f2f3f5">03 — TRAYECTORIA <tspan fill="#ff2633">.</tspan></text>
+  <text x="930" y="52" font-size="12" letter-spacing="2" fill="#9aa0a8" text-anchor="end">git log <tspan fill="#ff2633">--graph --oneline --all</tspan></text>
+  <line x1="30" y1="65" x2="930" y2="65" stroke="#ffffff" stroke-opacity="0.12"/>
+  <line x1="110" y1="152" x2="870" y2="152" stroke="#27406b" stroke-width="1"/>
+
+  <text x="150" y="128" font-size="17" font-weight="bold" fill="#ff2633" text-anchor="middle">2025</text>
+  <circle cx="150" cy="152" r="5" fill="#ff2633"/>
+  <text x="150" y="185" font-size="13.5" font-weight="bold" fill="#f2f3f5" text-anchor="middle">CITALY — FULL STACK</text>
+  <text x="150" y="207" font-size="12" fill="#ff2633" text-anchor="middle" opacity="0.85">[ Next.js · Node · MySQL ]</text>
+  <text x="150" y="232" font-size="12" fill="#9aa0a8" text-anchor="middle">agenda de turnos multi-usuario</text>
+  <text x="150" y="250" font-size="12" fill="#9aa0a8" text-anchor="middle">reservas online para rubros locales</text>
+  <text x="455" y="128" font-size="17" font-weight="bold" fill="#ff2633" text-anchor="middle">2024</text>
+  <circle cx="455" cy="152" r="5" fill="#ff2633"/>
+  <text x="455" y="185" font-size="13.5" font-weight="bold" fill="#f2f3f5" text-anchor="middle">FINSIGHT AI — LIDER DE EQUIPO</text>
+  <text x="455" y="207" font-size="12" fill="#ff2633" text-anchor="middle" opacity="0.85">[ Java · Spring Boot · React ]</text>
+  <text x="455" y="232" font-size="12" fill="#9aa0a8" text-anchor="middle">plataforma de analisis financiero</text>
+  <text x="455" y="250" font-size="12" fill="#9aa0a8" text-anchor="middle">con machine learning aplicado</text>
+  <text x="760" y="128" font-size="17" font-weight="bold" fill="#ff2633" text-anchor="middle">2023–24</text>
+  <circle cx="760" cy="152" r="5" fill="#ff2633"/>
+  <text x="760" y="185" font-size="13.5" font-weight="bold" fill="#f2f3f5" text-anchor="middle">MOTO — AUTODIDACTA</text>
+  <text x="760" y="207" font-size="12" fill="#ff2633" text-anchor="middle" opacity="0.85">[ Rust · Astro · Solid ]</text>
+  <text x="760" y="232" font-size="12" fill="#9aa0a8" text-anchor="middle">portfolio + experimentos WebGL</text>
+  <text x="760" y="250" font-size="12" fill="#9aa0a8" text-anchor="middle">ascii3d · editorial · shaders</text>
+  <text x="480" y="284" font-size="11" letter-spacing="4" fill="#9aa0a8" text-anchor="middle">SELF TAUGHT · BUILDING EVERY DAY</text>
+</svg>

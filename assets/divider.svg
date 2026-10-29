@@ -1,0 +1,15 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="860" height="18" viewBox="0 0 860 18" fill="none">
+  <!-- divisor blueprint MOTO: linea tenue + cruces rojas en los extremos -->
+  <line x1="30" y1="9" x2="830" y2="9" stroke="#27406b" stroke-width="1" opacity="0.55"/>
+  <g stroke="#ff2633" stroke-width="2" opacity="0.9">
+    <path d="M6 3 v12 M0 9 h12"/>
+    <path d="M854 3 v12 M848 9 h12"/>
+  </g>
+  <g stroke="#27406b" stroke-width="1" opacity="0.8">
+    <path d="M110 5 v8 M107 9 h6"/>
+    <path d="M250 5 v8 M247 9 h6"/>
+    <path d="M430 5 v8 M427 9 h6"/>
+    <path d="M610 5 v8 M607 9 h6"/>
+    <path d="M750 5 v8 M747 9 h6"/>
+  </g>
+</svg>

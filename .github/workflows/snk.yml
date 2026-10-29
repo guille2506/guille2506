@@ -1,0 +1,37 @@
+name: snake MOTO
+
+on:
+  schedule:
+    - cron: "17 0 * * *"
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/snk.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: generar snake (rojo MOTO #ff2633)
+        uses: Platane/snk/svg-only@v3
+        with:
+          github_user_name: guille2506
+          outputs: |
+            dist/github-contribution-grid-snake.svg?color_snake=%23ff2633&color_dots=%231d2946%2C%2327406b%2C%233a5a8c%2C%233b82c4%2C%23ff2633
+            dist/github-contribution-grid-snake-dark.svg?palette=github-dark&color_snake=%23ff2633
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: publicar branch output
+        uses: crazy-max/ghaction-github-pages@v4
+        with:
+          target_branch: output
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
