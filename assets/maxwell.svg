@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="430" height="410" viewBox="0 0 430 410" font-family="'IBM Plex Mono','JetBrains Mono','Courier New',monospace">
+  <defs>
+    <pattern id="mgrille" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0V48H0" fill="none" stroke="#1d2946" stroke-width="1" opacity="0.5"/>
+    </pattern>
+    <pattern id="mcross" width="192" height="192" patternUnits="userSpaceOnUse" x="88" y="62">
+      <path d="M90 96h12M96 90v12" fill="none" stroke="#ff2633" stroke-opacity="0.4" stroke-width="1.6"/>
+    </pattern>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff2633" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#ff2633" stop-opacity="0.15"/>
+    </linearGradient>
+  </defs>
+
+  <style>
+    .ear2 { animation: twitch 6.5s ease-in-out infinite; transform-origin: 342px 120px; transform-box: view-box; }
+    @keyframes twitch { 0%,72%,80%,100% { transform: rotate(0deg); } 74%,78% { transform: rotate(-7deg); } }
+    .whisk { animation: sway 4.2s ease-in-out infinite alternate; transform-origin: 380px 206px; transform-box: view-box; }
+    @keyframes sway { from { transform: rotate(0.6deg); } to { transform: rotate(-0.6deg); } }
+    .rim { animation: pulse 3.2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { opacity: 0.75; } 50% { opacity: 1; } }
+    .lid { animation: blink 5.4s linear infinite; transform-origin: 336px 166px; transform-box: view-box; }
+    @keyframes blink { 0%,92%,98%,100% { transform: scaleY(0); } 93%,97% { transform: scaleY(1); } }
+    .live { animation: pulse 1.8s ease-in-out infinite; }
+  </style>
+
+  <!-- panel blueprint -->
+  <rect width="430" height="410" fill="#0d1117"/>
+  <rect width="430" height="410" fill="url(#mgrille)"/>
+  <rect width="430" height="410" fill="url(#mcross)"/>
+  <rect x="12" y="12" width="406" height="386" fill="none" stroke="#ffffff" stroke-opacity="0.10"/>
+
+  <text x="28" y="36" font-size="13" letter-spacing="4" fill="#f2f3f5">MAXWELL <tspan fill="#ff2633">.</tspan></text>
+  <text x="402" y="36" font-size="10" letter-spacing="2" fill="#9aa0a8" text-anchor="end">id: 8ekyy7vviu</text>
+  <line x1="28" y1="48" x2="402" y2="48" stroke="#ffffff" stroke-opacity="0.12"/>
+
+  <!-- sombra -->
+  <ellipse cx="208" cy="342" rx="148" ry="12" fill="#000000" opacity="0.45"/>
+
+  <!-- orejas pegadas al lomo/cabeza -->
+  <path d="M294 140 L306 88 L330 126 L294 140 Z" fill="#07090d" stroke="#ff2633" stroke-opacity="0.45" stroke-width="1.4"/>
+  <path d="M302 122 L307 100 L318 116 Z" fill="#ff2633" opacity="0.12"/>
+  <g class="ear2">
+    <path d="M326 138 L342 82 L366 124 L326 138 Z" fill="#07090d" stroke="#ff2633" stroke-opacity="0.55" stroke-width="1.4"/>
+    <path d="M336 118 L345 94 L357 114 Z" fill="#ff2633" opacity="0.14"/>
+  </g>
+
+  <!-- cuerpo: corona estrecha al lomo + cabeza fusionada -->
+  <path d="M62 320
+           C56 250 86 158 172 130
+           C226 112 262 116 288 124
+           C310 128 330 134 342 144
+           C360 158 368 190 368 214
+           C372 250 361 284 349 306
+           C341 320 333 330 325 334
+           C237 340 127 338 62 320 Z"
+        fill="#07090d"/>
+
+  <!-- pecho blanco (mas angosto) -->
+  <path d="M330 212
+           C338 246 330 288 308 326
+           C294 334 280 332 271 327
+           C291 282 301 244 300 210
+           C310 206 321 208 330 212 Z"
+        fill="#e9ecef" opacity="0.88"/>
+
+  <!-- rim light rojo en el lomo -->
+  <path class="rim" d="M64 318
+           C58 248 88 158 174 130
+           C224 113 258 116 286 124"
+        fill="none" stroke="url(#rim)" stroke-width="3" stroke-linecap="round"/>
+  <path class="rim" d="M340 150 C356 164 364 186 367 212"
+        fill="none" stroke="url(#rim)" stroke-width="2.2" stroke-linecap="round"/>
+
+  <!-- hatching punteado lateral -->
+  <g stroke="#ff2633" stroke-opacity="0.30" stroke-width="1.4" fill="none" stroke-dasharray="2 9">
+    <path d="M92 296 C104 238 134 186 184 160"/>
+    <path d="M108 312 C122 252 156 200 208 172"/>
+  </g>
+
+  <!-- cara -->
+  <ellipse cx="338" cy="190" rx="24" ry="28" fill="#0b0d12"/>
+  <polygon points="376,200 382,200 379,207" fill="#e9ecef"/>
+  <!-- ojo -->
+  <g>
+    <ellipse cx="338" cy="166" rx="7" ry="9" fill="#000000"/>
+    <ellipse cx="338" cy="166" rx="7" ry="9" fill="none" stroke="#ff2633" stroke-width="1.2" opacity="0.85"/>
+    <circle cx="336" cy="163" r="1.5" fill="#f2f3f5"/>
+    <rect class="lid" x="330" y="156" width="16" height="20" fill="#07090d"/>
+  </g>
+  <!-- bigotes: hacia afuera, chicos sin invadir -->
+  <g class="whisk" stroke="#e9ecef" stroke-width="1.3" stroke-linecap="round" opacity="0.92">
+    <path d="M372 196 C386 190 398 188 408 186"/>
+    <path d="M372 203 C388 202 400 202 410 202"/>
+    <path d="M372 210 C386 214 396 217 406 219"/>
+    <path d="M370 206 C360 210 352 214 346 218"/>
+  </g>
+  <!-- boca -->
+  <path d="M370 210 C366 216 362 218 356 218" fill="none" stroke="#3a3f4a" stroke-width="1.2"/>
+
+  <line x1="28" y1="374" x2="402" y2="374" stroke="#ffffff" stroke-opacity="0.12"/>
+  <text x="28" y="392" font-size="10" letter-spacing="2" fill="#9aa0a8">maxwell_the_cat_dingus.glb</text>
+  <text x="402" y="392" font-size="10" letter-spacing="2" fill="#9aa0a8" text-anchor="end">RENDER <tspan class="live" fill="#ff2633">&#9679; LIVE</tspan></text>
+</svg>

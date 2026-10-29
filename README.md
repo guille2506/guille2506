@@ -16,7 +16,7 @@
       <img src="assets/whoami.svg" width="100%" alt="terminal whoami" />
     </td>
     <td width="34%" valign="middle">
-      <img src="assets/maxwell.png" width="100%" alt="Maxwell, la mascota 3D de MOTO" />
+      <img src="assets/maxwell.svg" width="100%" alt="Maxwell, la mascota 3D de MOTO" />
     </td>
   </tr>
 </table>
