@@ -222,49 +222,49 @@ def text_width(text: str, font_size: float) -> float:
 # --------------------------------------------------------------------------- #
 
 def face_points(rng: np.random.Generator) -> tuple:
-    """Dithered portrait dots in LOCAL space (0..300 x 0..340) + bbox."""
-    src = Image.open(SOURCE / "face.png").convert("RGBA")
+    """Dithered portrait dots in LOCAL space (0..300 x 0..340) + bbox.
+
+    Fuente: face2_cut.png (rembg U2-Net, silueta RGBA con fondo transparente).
+    El corte hace innecesarios los floods de fondo: fuera de la silueta
+    no hay pixeles y el panel queda limpio.
+    """
+    src = Image.open(SOURCE / "face2_cut.png").convert("RGBA")
     w, h = src.size
-    crop_w = int(w * 0.74)
+    crop_w = 900
     crop_h = int(crop_w * (340 / 300))
-    left = max(0, int(w * 0.13))
-    top = int(h * 0.02)
-    crop = src.crop((left, top, min(w, left + crop_w), min(h, top + crop_h)))
+    x0, y0 = 70, 280
+    crop = src.crop((x0, y0, min(w, x0 + crop_w), min(h, y0 + crop_h)))
     crop = crop.resize(FACE_GRID, Image.Resampling.LANCZOS)
 
-    rgb = np.asarray(crop.convert("RGB")).astype(np.float32)
-    # fondo azul oscuro (pared) -> flood por color con guard azul
-    bg_like = color_flood_background(rgb, tol=32.0, blue_guard=True)
-    bg_mask = edge_connected(bg_like)
+    alpha = np.asarray(crop)[..., 3]
+    person = alpha > 40
 
     bg_img = Image.new("RGBA", crop.size, "black")
     bg_img.alpha_composite(crop)
     gray = ImageOps.grayscale(bg_img.convert("RGB"))
+    prepd = ImageOps.autocontrast(gray, cutoff=1)
+    prepd = ImageEnhance.Contrast(prepd).enhance(1.08)
+    prepd = prepd.filter(ImageFilter.UnsharpMask(radius=1.4, percent=100, threshold=2))
 
-    g = np.asarray(gray).astype(np.float32) / 255.0
-    low = np.asarray(gray.filter(ImageFilter.GaussianBlur(radius=7.0))).astype(np.float32) / 255.0
-    # adaptive: features (gafas/ojos/nariz) sin depender de la luz del cuarto
-    feat = np.clip((g - low + 0.50) / 1.05, 0, 1)
-    # shading global: estiramiento suave del rango del rostro
-    vals = g[~bg_mask]
-    p10, p92 = np.percentile(vals, (10, 92))
-    arrn = np.clip((g - p10) / max(p92 - p10, 0.05), 0, 1)
-    field = np.clip(0.45 * feat + 0.55 * arrn, 0, 1)
-    field = field * (~bg_mask)
+    field = np.asarray(prepd).astype(np.float32) / 255.0
+    # fade del busto al borde inferior del crop
+    hh = field.shape[0]
+    ramp = np.clip((hh - 8 - np.arange(hh)) / 46.0, 0, 1)
+    field = field * ramp[:, None]
     # un pelo de ruido para romper bandas planas
-    field = np.clip(field + np.random.default_rng(SEED + 11).normal(0, 0.012, field.shape), 0, 1)
+    field = np.clip(field + np.random.default_rng(SEED + 11).normal(0, 0.010, field.shape), 0, 1)
 
     bits = floyd_steinberg(field * 255.0)
-    active = bits & (~bg_mask)
+    active = bits & person
 
-    # speckles sueltos mueren (quedan la cara y clusters grandes)
+    # speckles sueltos del borde alpha mueren
     lab, n = ndi_label(active)
     if n:
         sizes = np.bincount(lab.ravel())
         sizes[0] = 0
         keep_labels = {int(np.argmax(sizes))}
         for lid in range(1, n + 1):
-            if sizes[lid] > 1500:
+            if sizes[lid] > 400:
                 keep_labels.add(lid)
         active = active & np.isin(lab, list(keep_labels))
 
@@ -273,8 +273,8 @@ def face_points(rng: np.random.Generator) -> tuple:
         raise SystemExit("no face dots")
     points = np.column_stack((xs, ys)).astype(np.float32)
     red_flags = np.zeros(len(points), dtype=bool)  # cara limpia ice
-    if len(points) > 12000:
-        keep2 = rng.choice(len(points), 12000, replace=False)
+    if len(points) > 13000:
+        keep2 = rng.choice(len(points), 13000, replace=False)
         points = points[keep2]
     bbox = (xs.min(), xs.max() + 1, ys.min(), ys.max() + 1)
     return points, bbox, red_flags
@@ -311,17 +311,20 @@ def cat_points() -> tuple:
 
     ice = dots_from(ice_mask, np.full(visible.shape, 0.92))
 
-    # contorno de la silueta (2px de erosion): el rim rojo vive ahi
-    outline = visible & ~binary_erosion(visible, iterations=2)
-    warm_mask = visible & (~ice_mask) & (sat > 26)
-    body_mask = visible & (~ice_mask) & (~warm_mask) & (~outline)
+    # contorno de la silueta: banda 2px. el px externo = linea SOLIDA (1.0),
+    # el interno = trazo secundario mas tenue -> linea continua legible
+    outline2 = visible & ~binary_erosion(visible, iterations=2)
+    outline1 = visible & ~binary_erosion(visible, iterations=1)
+    warm_mask = visible & (~ice_mask) & (sat > 26) & (~outline2)
+    body_mask = visible & (~ice_mask) & (~warm_mask) & (~outline2)
 
-    # rojo: contorno denso, interior apenas insinuado
-    red_field = np.where(outline, np.clip(0.62 + lum / 260.0, 0, 0.9),
-                         np.clip(0.05 + lum / 520.0, 0, 0.22))
-    red = dots_from(outline | warm_mask, red_field)
-    # cuerpo: hatch muy tenue, la forma la lleva el contorno y el pecho
-    dim = dots_from(body_mask, np.clip(0.16 + lum / 300.0, 0, 1))
+    # rojo: linea solida en el borde, interior apenas insinuado
+    red_field = np.where(outline2,
+                         np.where(outline1, 1.0, np.clip(0.42 + lum / 300.0, 0, 0.62)),
+                         np.clip(0.04 + lum / 620.0, 0, 0.18))
+    red = dots_from(outline2 | warm_mask, red_field)
+    # cuerpo: hatch muy tenue, la forma la llevan el contorno y el pecho
+    dim = dots_from(body_mask, np.clip(0.12 + lum / 340.0, 0, 1))
 
     rng = np.random.default_rng(SEED)
     if len(red) > 3200:
@@ -394,7 +397,7 @@ def render_face_panel(points, bbox, red_flags) -> str:
         + '<g clip-path="url(#fclip)" shape-rendering="crispEdges">'
         + groups
         + "</g>"
-        + chrome_footer("src: github avatar",
+        + chrome_footer("src: selfie - rembg u2net",
                         f'PTS {len(points):05d} <tspan fill="{m["accent"]}">&#9679; FS/SERPENTINE</tspan>')
         + "</svg>"
     )
