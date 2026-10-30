@@ -381,13 +381,13 @@ def render_face_panel(points, bbox, red_flags) -> str:
     m = MOTO
     placed = place(points, *FACE_AREA, bbox, fill=0.85)
     groups = (
-        f'<path d="{point_path(placed)}" fill="none" stroke="{m["ice"]}" stroke-width="1.08" stroke-opacity="0.92"/>'
+        f'<path d="{point_path(placed)}" fill="none" stroke="{m["accent"]}" stroke-width="1.08" stroke-opacity="0.95"/>'
     )
     if len(red_flags) and bool(np.asarray(red_flags).any()):
         red_p = place(points[red_flags], *FACE_AREA, bbox, fill=0.99)
         groups = (
-            f'<path d="{point_path(placed[~red_flags])}" fill="none" stroke="{m["ice"]}" stroke-width="1.08" stroke-opacity="0.9"/>'
-            + f'<path d="{point_path(red_p)}" fill="none" stroke="{m["accent"]}" stroke-width="1.2" stroke-opacity="0.95"/>'
+            f'<path d="{point_path(placed[~red_flags])}" fill="none" stroke="{m["accent"]}" stroke-width="1.08" stroke-opacity="0.9"/>'
+            + f'<path d="{point_path(red_p)}" fill="none" stroke="{m["ice"]}" stroke-width="1.2" stroke-opacity="0.95"/>'
         )
     body = (
         '<svg xmlns="http://www.w3.org/2000/svg" width="430" height="410" viewBox="0 0 430 410" '
@@ -570,7 +570,7 @@ def render_morph(face, face_bbox, red_pts, ice_pts, dim_pts, cbbox, rng) -> None
         drift_position_values = ";".join(drift_positions)
         drift_opacity_values = ";".join(drift_opacity)
         parts.append(
-            f'<path d="{point_path(pts)}" fill="none" stroke="{m["ice"]}" stroke-width="1" opacity=".9">'
+            f'<path d="{point_path(pts)}" fill="none" stroke="{m["accent"]}" stroke-width="1" opacity=".9">'
             f'<animateTransform attributeName="transform" type="translate" begin="{INTRO_SECONDS}s" '
             f'dur="{loop_duration}s" repeatCount="indefinite" calcMode="linear" '
             f'keyTimes="{key_times}" values="{drift_position_values}"/>'
@@ -583,10 +583,10 @@ def render_morph(face, face_bbox, red_pts, ice_pts, dim_pts, cbbox, rng) -> None
         positions = ";".join(
             f"{num(fr[i, 0])} {num(fr[i, 1])}" for fr in frames)
         parts.append(
-            f'<path d="M-.65-.65h1.3v1.3h-1.3z" fill="{m["ice"]}">'
+            f'<path d="M-.65-.65h1.3v1.3h-1.3z" fill="{m["accent"]}">'
             f'<animate attributeName="fill" begin="{INTRO_SECONDS}s" dur="{loop_duration}s" '
             f'repeatCount="indefinite" calcMode="linear" keyTimes="{key_times}" '
-            f'values="{m["ice"]};{m["ice"]};{m["accent"]};{m["accent"]};{m["ice"]}"/>'
+            f'values="{m["accent"]};{m["accent"]};{m["accent"]};{m["accent"]};{m["accent"]}"/>'
             f'<animateTransform attributeName="transform" type="translate" begin="{INTRO_SECONDS}s" '
             f'dur="{loop_duration}s" repeatCount="indefinite" calcMode="linear" '
             f'keyTimes="{key_times}" values="{positions}"/>'
@@ -623,7 +623,7 @@ def render_morph(face, face_bbox, red_pts, ice_pts, dim_pts, cbbox, rng) -> None
         if not len(pts):
             continue
         parts.append(
-            f'<path d="{point_path(pts)}" fill="none" stroke="{m["ice"]}" stroke-width="1" opacity="0">'
+            f'<path d="{point_path(pts)}" fill="none" stroke="{m["accent"]}" stroke-width="1" opacity="0">'
             f'<animate attributeName="opacity" begin="{num(starts[group])}s" dur=".8s" '
             'values="0;1" fill="freeze"/>'
             '<animate attributeName="opacity" begin="3.08s" dur=".12s" values="1;0" fill="freeze"/>'
@@ -643,7 +643,7 @@ def render_morph(face, face_bbox, red_pts, ice_pts, dim_pts, cbbox, rng) -> None
 
 
 def main() -> None:
-    for required in ("face.png", "maxwell.png"):
+    for required in ("face.png", "face2_cut.png", "maxwell.png"):
         if not (SOURCE / required).exists():
             raise SystemExit(f"falta la fuente: SOURCE/{required}")
     ASSETS.mkdir(parents=True, exist_ok=True)
