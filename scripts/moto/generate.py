@@ -23,6 +23,7 @@ from pathlib import Path
 
 import numpy as np
 from PIL import Image, ImageEnhance, ImageFilter, ImageOps
+from scipy.ndimage import binary_erosion, label as ndi_label
 from scipy.optimize import linear_sum_assignment
 from scipy.spatial.distance import cdist
 
@@ -224,39 +225,59 @@ def face_points(rng: np.random.Generator) -> tuple:
     """Dithered portrait dots in LOCAL space (0..300 x 0..340) + bbox."""
     src = Image.open(SOURCE / "face.png").convert("RGBA")
     w, h = src.size
-    crop_w = int(w * 0.64)
+    crop_w = int(w * 0.74)
     crop_h = int(crop_w * (340 / 300))
-    left = max(0, int(w * 0.21))
+    left = max(0, int(w * 0.13))
     top = int(h * 0.02)
     crop = src.crop((left, top, min(w, left + crop_w), min(h, top + crop_h)))
     crop = crop.resize(FACE_GRID, Image.Resampling.LANCZOS)
 
     rgb = np.asarray(crop.convert("RGB")).astype(np.float32)
-    gray = ImageOps.grayscale(crop)
-    g = np.asarray(gray).astype(np.float32)
-    # fondo azul oscuro -> flood por color con guard azul
+    # fondo azul oscuro (pared) -> flood por color con guard azul
     bg_like = color_flood_background(rgb, tol=32.0, blue_guard=True)
     bg_mask = edge_connected(bg_like)
 
     bg_img = Image.new("RGBA", crop.size, "black")
     bg_img.alpha_composite(crop)
-    prepared = ImageOps.grayscale(bg_img.convert("RGB"))
-    prepared = ImageOps.autocontrast(prepared, cutoff=1)
-    prepared = ImageEnhance.Contrast(prepared).enhance(1.28)
-    prepared = ImageEnhance.Brightness(prepared).enhance(1.18)
-    prepared = prepared.filter(ImageFilter.UnsharpMask(radius=2.0, percent=160, threshold=1))
-    bits = floyd_steinberg(np.asarray(prepared))
+    gray = ImageOps.grayscale(bg_img.convert("RGB"))
+
+    g = np.asarray(gray).astype(np.float32) / 255.0
+    low = np.asarray(gray.filter(ImageFilter.GaussianBlur(radius=7.0))).astype(np.float32) / 255.0
+    # adaptive: features (gafas/ojos/nariz) sin depender de la luz del cuarto
+    feat = np.clip((g - low + 0.50) / 1.05, 0, 1)
+    # shading global: estiramiento suave del rango del rostro
+    vals = g[~bg_mask]
+    p10, p92 = np.percentile(vals, (10, 92))
+    arrn = np.clip((g - p10) / max(p92 - p10, 0.05), 0, 1)
+    field = np.clip(0.45 * feat + 0.55 * arrn, 0, 1)
+    field = field * (~bg_mask)
+    # un pelo de ruido para romper bandas planas
+    field = np.clip(field + np.random.default_rng(SEED + 11).normal(0, 0.012, field.shape), 0, 1)
+
+    bits = floyd_steinberg(field * 255.0)
     active = bits & (~bg_mask)
+
+    # speckles sueltos mueren (quedan la cara y clusters grandes)
+    lab, n = ndi_label(active)
+    if n:
+        sizes = np.bincount(lab.ravel())
+        sizes[0] = 0
+        keep_labels = {int(np.argmax(sizes))}
+        for lid in range(1, n + 1):
+            if sizes[lid] > 1500:
+                keep_labels.add(lid)
+        active = active & np.isin(lab, list(keep_labels))
 
     ys, xs = np.where(active)
     if len(xs) == 0:
         raise SystemExit("no face dots")
     points = np.column_stack((xs, ys)).astype(np.float32)
-    if len(points) > 15000:
-        keep = rng.choice(len(points), 15000, replace=False)
-        points = points[keep]
+    red_flags = np.zeros(len(points), dtype=bool)  # cara limpia ice
+    if len(points) > 12000:
+        keep2 = rng.choice(len(points), 12000, replace=False)
+        points = points[keep2]
     bbox = (xs.min(), xs.max() + 1, ys.min(), ys.max() + 1)
-    return points, bbox
+    return points, bbox, red_flags
 
 
 def cat_points() -> tuple:
@@ -276,7 +297,7 @@ def cat_points() -> tuple:
 
     # el render es cálido en general: pecho y rim comparten familia naranja.
     # se separa por BRILLO (ice = luces/pecho/bigotes) y Saturación (rojo).
-    ice_mask = visible & (lum > 140)
+    ice_mask = visible & (lum > 135)
     warm_mask = visible & (~ice_mask) & (sat > 30)
     body_mask = visible & (~ice_mask) & (~warm_mask)
 
@@ -288,18 +309,25 @@ def cat_points() -> tuple:
         by, bx = np.where(floyd_steinberg(f * 255.0))
         return np.column_stack((bx, by)).astype(np.float32)
 
-    ice = dots_from(ice_mask, np.full(visible.shape, 0.85))
-    # rojo: densidad crece hacia el rim luminoso; cap para no formar blobs
-    red = dots_from(warm_mask, np.clip(0.38 + lum / 320.0, 0, 0.74))
-    red = red[((red[:, 0].astype(int) + red[:, 1].astype(int)) % 2) == 0]
-    # cuerpo: hatching tenue con densidad base
-    dim = dots_from(body_mask, np.clip(0.30 + lum / 220.0, 0, 1))
+    ice = dots_from(ice_mask, np.full(visible.shape, 0.92))
+
+    # contorno de la silueta (2px de erosion): el rim rojo vive ahi
+    outline = visible & ~binary_erosion(visible, iterations=2)
+    warm_mask = visible & (~ice_mask) & (sat > 26)
+    body_mask = visible & (~ice_mask) & (~warm_mask) & (~outline)
+
+    # rojo: contorno denso, interior apenas insinuado
+    red_field = np.where(outline, np.clip(0.62 + lum / 260.0, 0, 0.9),
+                         np.clip(0.05 + lum / 520.0, 0, 0.22))
+    red = dots_from(outline | warm_mask, red_field)
+    # cuerpo: hatch muy tenue, la forma la lleva el contorno y el pecho
+    dim = dots_from(body_mask, np.clip(0.16 + lum / 300.0, 0, 1))
 
     rng = np.random.default_rng(SEED)
-    if len(red) > 4200:
-        red = red[rng.choice(len(red), 4200, replace=False)]
-    if len(dim) > 7000:
-        dim = dim[rng.choice(len(dim), 7000, replace=False)]
+    if len(red) > 3200:
+        red = red[rng.choice(len(red), 3200, replace=False)]
+    if len(dim) > 4200:
+        dim = dim[rng.choice(len(dim), 4200, replace=False)]
 
     return red, ice, dim, bbox
 
@@ -343,19 +371,28 @@ def chrome_footer(left_label: str, right_html: str) -> str:
     )
 
 
-FACE_AREA = (34, 64, 362, 296)   # x, y, w, h dentro del panel 430x410
+FACE_AREA = (58, 74, 314, 288)   # x, y, w, h dentro del panel 430x410
 
 
-def render_face_panel(points, bbox) -> str:
+def render_face_panel(points, bbox, red_flags) -> str:
     m = MOTO
-    placed = place(points, *FACE_AREA, bbox, fill=0.97)
+    placed = place(points, *FACE_AREA, bbox, fill=0.85)
+    groups = (
+        f'<path d="{point_path(placed)}" fill="none" stroke="{m["ice"]}" stroke-width="1.08" stroke-opacity="0.92"/>'
+    )
+    if len(red_flags) and bool(np.asarray(red_flags).any()):
+        red_p = place(points[red_flags], *FACE_AREA, bbox, fill=0.99)
+        groups = (
+            f'<path d="{point_path(placed[~red_flags])}" fill="none" stroke="{m["ice"]}" stroke-width="1.08" stroke-opacity="0.9"/>'
+            + f'<path d="{point_path(red_p)}" fill="none" stroke="{m["accent"]}" stroke-width="1.2" stroke-opacity="0.95"/>'
+        )
     body = (
         '<svg xmlns="http://www.w3.org/2000/svg" width="430" height="410" viewBox="0 0 430 410" '
         f'font-family="{MONO}" role="img" aria-label="retrato 1-bit de Guillermo">'
         "<defs>" + chrome_defs("f") + "</defs>"
         + chrome_header("GUILLERMO", "1-BIT / DITHER", "f")
         + '<g clip-path="url(#fclip)" shape-rendering="crispEdges">'
-        + f'<path d="{point_path(placed)}" fill="none" stroke="{m["ice"]}" stroke-width="1.05" stroke-opacity="0.9"/>'
+        + groups
         + "</g>"
         + chrome_footer("src: github avatar",
                         f'PTS {len(points):05d} <tspan fill="{m["accent"]}">&#9679; FS/SERPENTINE</tspan>')
@@ -609,10 +646,10 @@ def main() -> None:
     ASSETS.mkdir(parents=True, exist_ok=True)
 
     rng = np.random.default_rng(SEED)
-    face, fbbox = face_points(rng)
+    face, fbbox, face_red = face_points(rng)
     f = ASSETS / "moto-face.svg"
-    f.write_text(render_face_panel(face, fbbox), encoding="utf-8")
-    print(f"{f.name}: {f.stat().st_size:,} bytes, puntos cara {len(face):,}")
+    f.write_text(render_face_panel(face, fbbox, face_red), encoding="utf-8")
+    print(f"{f.name}: {f.stat().st_size:,} bytes, puntos cara {len(face):,} (rojo {int(face_red.sum()) if len(face_red) else 0})")
 
     warm_lattice, ice, dim, cbbox = cat_points()
     c = ASSETS / "moto-maxwell.svg"
