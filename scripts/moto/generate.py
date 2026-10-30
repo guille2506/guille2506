@@ -397,7 +397,7 @@ def render_face_panel(points, bbox, red_flags) -> str:
         + '<g clip-path="url(#fclip)" shape-rendering="crispEdges">'
         + groups
         + "</g>"
-        + chrome_footer("src: selfie - rembg u2net",
+        + chrome_footer("src: selfie REMBG",
                         f'PTS {len(points):05d} <tspan fill="{m["accent"]}">&#9679; FS/SERPENTINE</tspan>')
         + "</svg>"
     )
